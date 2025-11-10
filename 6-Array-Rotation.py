@@ -3,145 +3,151 @@ class Solution:
         """
         Do not return anything, modify nums in-place instead.
         """
-        last = len(nums) - 1
+        last = len(nums) -1 
         k = k % last
-        count = 0 
-        while count < k :
-            last_elem = nums[last]
-            i = last
-            while i > 0 :
-                nums[i] = nums[i-1] 
-                i -= 1
-            nums[0] = last_elem
-            count += 1
+
+    self.reverse(nums,0,last-1)
+    self.reverse(nums,0,k-1)
+    self.reverse(nums,k,n-1)
+
+    
+    def reverse(self, nums , start , stop):
+        nums[start], nums[stop] = nums[stop], nums[start]
+        start += 1 
+        stop -= 1
 
 """ 
 
-## Setup Part
+## The Main Idea
+
+Instead of moving elements one by one (which is slow), we use a **clever trick with reversing**!
+
+---
+
+## Part 1: The `reverse` Helper Function
+
+```python
+def reverse(self, nums, start, end):
+    while start < end:
+        nums[start], nums[end] = nums[end], nums[start]
+        start += 1
+        end -= 1
+```
+
+This function reverses a portion of the array from `start` to `end`.
+
+**Example:** Reverse `[1,2,3,4,5]` from index 0 to 4
+
+- **Step 1:** Swap `nums[0]` and `nums[4]` → `[5,2,3,4,1]`
+- **Step 2:** Swap `nums[1]` and `nums[3]` → `[5,4,3,2,1]`
+- **Step 3:** `start = 2, end = 2` (they meet, stop!)
+
+**Result:** `[5,4,3,2,1]` ✅
+
+---
+
+## Part 2: The Main `rotate` Function
 
 ```python
 n = len(nums)
-```
-- `n` stores the length of the array
-- Example: if `nums = [1,2,3,4,5,6,7]`, then `n = 7`
-
-```python
 k = k % n
 ```
-- This handles cases when `k` is bigger than array length
-- Example: If `k = 10` and `n = 7`, rotating 10 times is same as rotating 3 times
-- `10 % 7 = 3`, so `k = 3`
-- **Why?** Because after every 7 rotations, array comes back to original position!
-
-```python
-count = 0
-```
-- This tracks how many rotations we've done
-- We need to do `k` rotations total
+- `n` = length of array
+- `k % n` handles when k is larger than array size
 
 ---
 
-## Main Loop (Outer While)
+### The 3-Step Magic Formula
 
-```python
-while count < k:
-```
-- This loop runs `k` times
-- Each time through this loop = 1 rotation
+Let's use: `nums = [1,2,3,4,5,6,7], k = 3`
+
+We want to get: `[5,6,7,1,2,3,4]`
 
 ---
 
-## Inside Each Rotation
+### **Step 1: Reverse the ENTIRE array**
 
-### Step 1: Save the Last Element
 ```python
-last_element = nums[n - 1]
+self.reverse(nums, 0, n - 1)
 ```
-- `n - 1` is the last index (because array starts at 0)
-- Save this element because we'll overwrite it soon
 
-**Example:** `nums = [1,2,3,4,5,6,7]`
-- `last_element = 7`
+- Reverse from index `0` to `6` (entire array)
+- `[1,2,3,4,5,6,7]` → `[7,6,5,4,3,2,1]`
+
+**Why?** This puts the elements that need to go to the front (5,6,7) near the front, but in wrong order!
 
 ---
 
-### Step 2: Shift Everything to the Right
+### **Step 2: Reverse the FIRST k elements**
 
 ```python
-i = n - 1
-while i > 0:
-    nums[i] = nums[i - 1]
-    i = i - 1
+self.reverse(nums, 0, k - 1)
 ```
 
-Let me show you this step by step:
+- Reverse from index `0` to `2` (first 3 elements)
+- `[7,6,5,4,3,2,1]` → `[5,6,7,4,3,2,1]`
 
-**Start:** `nums = [1,2,3,4,5,6,7]`, `i = 6`
-
-- **i = 6**: `nums[6] = nums[5]` → `[1,2,3,4,5,6,6]` (7 is gone, 6 copied)
-- **i = 5**: `nums[5] = nums[4]` → `[1,2,3,4,5,5,6]`
-- **i = 4**: `nums[4] = nums[3]` → `[1,2,3,4,4,5,6]`
-- **i = 3**: `nums[3] = nums[2]` → `[1,2,3,3,4,5,6]`
-- **i = 2**: `nums[2] = nums[1]` → `[1,2,2,3,4,5,6]`
-- **i = 1**: `nums[1] = nums[0]` → `[1,1,2,3,4,5,6]`
-- **i = 0**: Loop stops (because `i > 0` is false)
-
-Now array is: `[1,1,2,3,4,5,6]`
+**Why?** This fixes the order of the first k elements! Now `5,6,7` are in correct positions!
 
 ---
 
-### Step 3: Put Last Element at Front
+### **Step 3: Reverse the REMAINING elements**
 
 ```python
-nums[0] = last_element
+self.reverse(nums, k, n - 1)
 ```
-- Remember we saved `last_element = 7`
-- Now put it at the beginning
 
-**Result:** `[7,1,2,3,4,5,6]` ✅ One rotation complete!
+- Reverse from index `3` to `6` (last 4 elements)
+- `[5,6,7,4,3,2,1]` → `[5,6,7,1,2,3,4]`
 
----
-
-### Step 4: Increase Counter
-
-```python
-count = count + 1
-```
-- We finished 1 rotation, so increase counter
-- Loop continues until `count = k`
-
----
-
-## Complete Example
-
-**Input:** `nums = [1,2,3,4,5,6,7], k = 3`
-
-**Rotation 1 (count = 0):**
-- Save: `last_element = 7`
-- Shift: `[1,1,2,3,4,5,6]`
-- Place: `[7,1,2,3,4,5,6]`
-
-**Rotation 2 (count = 1):**
-- Save: `last_element = 6`
-- Shift: `[7,7,1,2,3,4,5]`
-- Place: `[6,7,1,2,3,4,5]`
-
-**Rotation 3 (count = 2):**
-- Save: `last_element = 5`
-- Shift: `[6,6,7,1,2,3,4]`
-- Place: `[5,6,7,1,2,3,4]`
-
-**Final Answer:** `[5,6,7,1,2,3,4]` ✅
+**Why?** This fixes the order of the rest of the array!
 
 ---
 
 ## Visual Summary
 
-Think of it like a circular conveyor belt:
-- Pick up the last item
-- Move everyone one step to the right
-- Put the last item at the front
-- Repeat k times
+```
+Original:           [1, 2, 3, 4, 5, 6, 7]
+
+Step 1 (Reverse all):      [7, 6, 5, 4, 3, 2, 1]
+                            └─────┘ └─────────┘
+                            mess!    mess!
+
+Step 2 (Reverse first k):  [5, 6, 7, 4, 3, 2, 1]
+                            └─────┘ 
+                            Fixed!   still mess
+
+Step 3 (Reverse rest):     [5, 6, 7, 1, 2, 3, 4]
+                            └─────┘ └─────────┘
+                            Perfect! Perfect!
+```
+
+---
+
+## Why Is This Fast?
+
+- **Your old code:** O(n × k) - shifts array k times
+- **This code:** O(n) - only 3 passes through array
+
+Each reverse operation goes through part of the array once, so:
+- Step 1: Goes through n elements
+- Step 2: Goes through k elements  
+- Step 3: Goes through (n-k) elements
+- **Total: n + k + (n-k) = 2n operations** = O(n) ✅
+
+---
+
+## Another Example
+
+`nums = [1,2,3,4,5], k = 2`
+
+**Step 1:** Reverse all → `[5,4,3,2,1]`  
+**Step 2:** Reverse first 2 → `[4,5,3,2,1]`  
+**Step 3:** Reverse last 3 → `[4,5,1,2,3]` ✅
+
+Expected: Last 2 elements (4,5) moved to front! ✅
+
+---
 
 """
         
