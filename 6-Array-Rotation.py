@@ -3,7 +3,7 @@ class Solution:
         """
         Do not return anything, modify nums in-place instead.
         """
-        last = len(nums) -1 
+        last = len(nums)
         k = k % last
 
         self.reverse(nums,0,last-1)
