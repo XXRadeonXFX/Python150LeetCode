@@ -6,15 +6,16 @@ class Solution:
         last = len(nums) -1 
         k = k % last
 
-    self.reverse(nums,0,last-1)
-    self.reverse(nums,0,k-1)
-    self.reverse(nums,k,n-1)
+        self.reverse(nums,0,last-1)
+        self.reverse(nums,0,k-1)
+        self.reverse(nums,k,last-1)
 
     
     def reverse(self, nums , start , stop):
-        nums[start], nums[stop] = nums[stop], nums[start]
-        start += 1 
-        stop -= 1
+        while start < stop:
+            nums[start], nums[stop] = nums[stop], nums[start]
+            start += 1 
+            stop -= 1
 
 """ 
 
